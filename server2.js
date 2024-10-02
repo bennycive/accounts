@@ -1,4 +1,5 @@
 const express = require('express');
+const { graphqlHTTP } = require('express-graphql');
 const sequelize = require('./config/database'); // Import your sequelize instance
 
 const app = express();
@@ -11,19 +12,52 @@ const Permission = require('./models/Permission');
 const UserGroup = require('./models/UserGroup');
 const UserPermission = require('./models/UserPermission');
 const GroupPermission = require('./models/GroupPermission');
+const DepartmentPermission = require('./models/DepartmentPermission'); // Adjust the path if necessary
+
+// Import GraphQL schema and resolvers
+const schema = require('./graphql/schema'); // Adjust the path to your GraphQL schema file
+
+// Define associations
+Department.hasMany(DepartmentPermission, {
+  foreignKey: 'departmentId',
+  as: 'departmentPermissions', // Alias for the association
+});
+
+DepartmentPermission.belongsTo(Department, {
+  foreignKey: 'departmentId',
+  as: 'department', // Alias for the association
+});
+
+Permission.hasMany(DepartmentPermission, {
+  foreignKey: 'permissionId',
+  as: 'departmentPermissions', // Alias for the association
+});
+
+DepartmentPermission.belongsTo(Permission, {
+  foreignKey: 'permissionId',
+  as: 'permission', // Alias for the association
+});
 
 // Sync all models with the database
 const syncModels = async () => {
   try {
-    await sequelize.sync({ force: false }); // Use { force: true } to drop existing tables and recreate them
-    console.log('All models were synchronized successfully.');
+    await sequelize.sync({ alter: true }); // Use { alter: true } to modify existing tables
+    console.log('\x1b[32mAll models were synchronized successfully.\x1b[0m'); // Print in green
   } catch (error) {
     console.error('Error synchronizing models:', error);
   }
 };
 
-syncModels();
+// Set up GraphQL endpoint
+app.use('/graphql', graphqlHTTP({
+  schema: schema, // Use your GraphQL schema
+  graphiql: true, // Enable GraphiQL UI for testing
+}));
 
+// Start the server and sync models
 app.listen(4000, () => {
   console.log('Server is running on http://localhost:4000');
+  syncModels(); // Sync models when the server starts
 });
+
+

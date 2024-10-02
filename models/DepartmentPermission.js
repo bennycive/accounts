@@ -1,19 +1,18 @@
+// models/DepartmentPermission.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Role = require('./Role');
-const Permission = require('./Permission');
 
-const GroupPermission = sequelize.define('GroupPermission', {
+const DepartmentPermission = sequelize.define('DepartmentPermission', {
   id: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
   },
-  group_id: {
+  department_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Role,
+      model: 'departments', // Table name
       key: 'id'
     }
   },
@@ -21,13 +20,13 @@ const GroupPermission = sequelize.define('GroupPermission', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Permission,
+      model: 'permissions', // Table name
       key: 'id'
     }
   }
 }, {
-  tableName: 'auth_group_permissions',
-  timestamps: false
+  tableName: 'department_permissions', // Use a suitable table name
+  timestamps: true
 });
 
-module.exports = GroupPermission;
+module.exports = DepartmentPermission;

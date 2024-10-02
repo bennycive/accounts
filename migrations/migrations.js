@@ -8,6 +8,7 @@ const UserGroup = require('../models/UserGroup');
 const UserPermission = require('../models/UserPermission');
 const GroupPermission = require('../models/GroupPermission');
 const Permission = require('../models/Permission');
+const DepartmentPermission = require('../models/DepartmentPermission');
 
 const runMigrations = async () => {
     try {
